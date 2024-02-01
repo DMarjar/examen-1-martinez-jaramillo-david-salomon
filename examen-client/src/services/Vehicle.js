@@ -17,6 +17,17 @@ const getVehiclesPaginated = async (page, size, sort) => {
     }
 };
 
+const insertVehicle = async (vehicle) => {
+    try {
+        const response = await axios.post('http://localhost:8080/api/vehiculos', vehicle);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+
+}
+
 export default {
-    getVehiclesPaginated
+    getVehiclesPaginated,
+    insertVehicle
 };

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1>Formulario</h1>
+    <b-breadcrumb :items="items"></b-breadcrumb>
     <b-form @submit.prevent="validateForm" novalidate>
       <b-alert variant="danger" :show="errors.length > 0">
         <b>
@@ -51,18 +53,25 @@
             placeholder="Número de serie del vehiculo"
         ></b-form-input>
       </b-form-group>
-      <b-button type="submit" variant="primary">Submit</b-button>
+      <b-button type="submit" variant="primary">Agregar</b-button>
+      <b-button variant="danger" @click="goToRoute('/vehicles')">Regresar</b-button>
     </b-form>
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
+import serviceVehicle from '../services/Vehicle';
 
 export default Vue.extend({
   name: 'Form',
   data() {
     return {
+      items: [
+        { text: 'Home', active: false, href: '/' },
+        { text: 'Vehiculos', active: false, href: '/vehicles' },
+        { text: 'Formulario', active: true },
+      ],
       // Validation
       errors: [],
       // Vehicle
@@ -101,7 +110,13 @@ export default Vue.extend({
       }
 
       if (!this.errors.length) {
-        alert('Formulario correcto');
+        const vehicle = {
+          brand: this.brand,
+          model: this.model,
+          year: this.year,
+          serie: this.serie,
+        };
+        this.createVehicle(vehicle);
       } else {
         event.preventDefault();
       }
@@ -111,6 +126,20 @@ export default Vue.extend({
 
     validateRegex(value, regex) {
       return regex.test(value);
+    },
+
+    async createVehicle(vehicle) {
+      try {
+        await serviceVehicle.insertVehicle(vehicle);
+        alert('Vehiculo creado correctamente');
+        this.goToRoute('/vehicles');
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    goToRoute(route) {
+      this.$router.push(route);
     },
   },
 });

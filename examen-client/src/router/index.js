@@ -10,7 +10,7 @@ const routes = [
     component:()=> import('../components/Home.vue')
   },
   {
-    path: '/form',
+    path: '/vehicles/form',
     name: 'form',
     component:()=> import('../components/Form.vue')
   },

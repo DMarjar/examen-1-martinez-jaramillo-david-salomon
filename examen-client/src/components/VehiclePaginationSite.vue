@@ -1,33 +1,34 @@
 <template>
   <div>
-    <b-container class="mt-5">
-      <b-input placeholder="Buscar" v-model="filter"></b-input>
-      <b-table
-          id="vehicle-table"
-          :items="vehicles"
+    <h1>Vehiculos</h1>
+    <b-breadcrumb :items="items"></b-breadcrumb>
+    <b-button class="mb-2" @click="goToRoute('/vehicles/form')">Agregar nuevo</b-button>
+    <b-input placeholder="Buscar" v-model="filter"></b-input>
+    <b-table
+        id="vehicle-table"
+        :items="vehicles"
+        :per-page="perPage"
+        :current-page="currentPage"
+        :fields="fields"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        label-sort-asc=""
+        label-sort-desc=""
+        small
+        :filter="filter"
+        @filtered="onFiltered"
+    >
+    </b-table>
+    <div class="overflow-auto">
+      <b-pagination
+          v-model="currentPage"
+          :total-rows="rows"
           :per-page="perPage"
-          :current-page="currentPage"
-          :fields="fields"
-          :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
-          label-sort-asc=""
-          label-sort-desc=""
-          small
-          :filter="filter"
-          @filtered="onFiltered"
-      >
-      </b-table>
-      <div class="overflow-auto">
-        <b-pagination
-            v-model="currentPage"
-            :total-rows="rows"
-            :per-page="perPage"
-            aria-controls="my-table"
-        ></b-pagination>
+          aria-controls="my-table"
+      ></b-pagination>
 
-        <p class="mt-3">Current Page: {{ currentPage }}</p>
-      </div>
-    </b-container>
+      <p class="mt-3">Current Page: {{ currentPage }}</p>
+    </div>
   </div>
 </template>
 
@@ -39,6 +40,11 @@ export default Vue.extend({
   name: "VehiclePaginationSite",
   data() {
     return {
+      items: [
+        {text: "Home", active: false, href: "/"},
+        {text: "Vehiculos", active: true},
+      ],
+
       filter: null,
       sortBy: "model",
       sortDesc: false,
@@ -47,10 +53,10 @@ export default Vue.extend({
       rows: 0,
       vehicles: [],
       fields: [
-        { key: "model", label: "Modelo", sortable: true },
-        { key: "brand", label: "Marca", sortable: true },
-        { key: "year", label: "Año", sortable: true },
-        { key: "serie", label: "Número de serie", sortable: true },
+        {key: "model", label: "Modelo", sortable: true},
+        {key: "brand", label: "Marca", sortable: true},
+        {key: "year", label: "Año", sortable: true},
+        {key: "serie", label: "Número de serie", sortable: true},
       ],
     };
   },
@@ -58,12 +64,12 @@ export default Vue.extend({
   methods: {
     async getVehicles() {
       try {
-        const response = await vehicleService.getVehiclesPaginated(
-            parseInt(this.currentPage),
+        const data = await vehicleService.getVehiclesPaginated(
+            parseInt(this.currentPage) - 1,
             parseInt(this.perPage),
             this.sortBy
         );
-        this.vehicles = response.data;
+        this.vehicles = data.content;
         this.rows = this.vehicles.length;
       } catch (error) {
         console.error(error);
@@ -72,6 +78,10 @@ export default Vue.extend({
 
     onFiltered(filteredItems) {
       this.rows = filteredItems.length;
+    },
+
+    goToRoute(route) {
+      this.$router.push(route);
     },
   },
 
