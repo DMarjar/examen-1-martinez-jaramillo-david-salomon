@@ -99,6 +99,8 @@ export default Vue.extend({
 
       if (!this.year) {
         this.errors.push('El año es requerido');
+      } else if (Number.isNaN(this.year)) {
+          this.errors.push('El año debe ser un número');
       } else if (this.year > new Date().getFullYear()) {
         this.errors.push('El año no puede ser mayor al año actual');
       }
